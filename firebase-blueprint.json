@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "Measurement": {
+      "title": "Measurement",
+      "description": "A time and motion measurement session for PDI Homologation.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "description": "Date of measurement" },
+        "process": { "type": "string", "description": "Process name" },
+        "model": { "type": "string", "description": "Vehicle model" },
+        "responsible": { "type": "string", "description": "Person responsible for measurement" },
+        "startTime": { "type": "string", "description": "Global start time" },
+        "endTime": { "type": "string", "description": "Global end time" },
+        "chassiInitial": { "type": "string", "description": "Initial vehicle chassis" },
+        "chassiFinal": { "type": "string", "description": "Final vehicle chassis" },
+        "activities": { "type": "array", "description": "List of activities measured" },
+        "totalTime": { "type": "number", "description": "Total time in minutes" },
+        "workday": { "type": "number", "description": "Considered workday in minutes" },
+        "capacity": { "type": "number", "description": "Theoretical capacity (units/day)" },
+        "userId": { "type": "string", "description": "User UID who owns the measurement" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["date", "process", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/measurements/{measurementId}": {
+      "schema": "Measurement",
+      "description": "Collection of time and motion measurements."
+    }
+  }
+}

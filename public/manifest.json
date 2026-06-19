@@ -1,0 +1,37 @@
+{
+  "id": "/?source=pwa",
+  "name": "PDI Homo",
+  "short_name": "PDI",
+  "description": "Ferramenta de Homologação e Controle de PDI",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/pdi_app_icon_1781712661725.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pdi_app_icon_1781712661725.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pdi_app_icon_1781712661725.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/pdi_app_icon_1781712661725.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

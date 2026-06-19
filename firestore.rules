@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Master Gate - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Helpers
+    function isValidMeasurement(data) {
+      return data.userId == request.auth.uid
+        && data.date is string && data.date.size() <= 64
+        && data.process is string && data.process.size() <= 128
+        && (data.model is string && data.model.size() <= 128)
+        && (data.responsible is string && data.responsible.size() <= 128)
+        && (data.chassiInitial is string && data.chassiInitial.size() <= 64)
+        && (data.chassiFinal is string && data.chassiFinal.size() <= 64)
+        && data.activities is list && data.activities.size() <= 100
+        && data.workday is number
+        && data.totalTime is number
+        && data.capacity is number
+        && data.createdAt == request.time;
+    }
+
+    match /measurements/{measurementId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isOwner(resource.data.userId);
+      
+      allow create: if isSignedIn() 
+        && isValidId(measurementId) 
+        && isValidMeasurement(incoming())
+        && incoming().keys().hasAll(['date', 'process', 'model', 'responsible', 'chassiInitial', 'chassiFinal', 'workday', 'userId', 'createdAt', 'activities', 'totalTime', 'capacity'])
+        && incoming().keys().size() == 12;
+
+      allow update: if isOwner(existing().userId)
+        && isValidMeasurement(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'date', 'process', 'model', 'responsible', 'startTime', 'endTime', 
+          'chassiInitial', 'chassiFinal', 'activities', 'totalTime', 'workday', 'capacity'
+        ]);
+
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

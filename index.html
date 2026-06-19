@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PDI Homo" />
+    <link rel="apple-touch-icon" href="/pdi_app_icon_1781712661725.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>PDI Homo</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Limpeza preventiva de caches de versões antigas do Service Worker para evitar tela em branco
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => {
+            if (name !== 'pdi-cache-v5') {
+              caches.delete(name).then(() => {
+                console.log('Cache obsoleto removido para evitar tela em branco:', name);
+              });
+            }
+          });
+        }).catch(err => console.log('Erro ao limpar caches:', err));
+      }
+
+      // Captura o evento de instalação antes do React carregar (corrige race condition)
+      window.deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        window.deferredPrompt = e;
+        window.dispatchEvent(new CustomEvent('pwa-prompt-available', { detail: e }));
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => {
+              console.log('Service Worker registrado com sucesso:', reg.scope);
+              // Se houver uma atualização, atualiza imediatamente
+              reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                if (installingWorker) {
+                  installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('Nova versão encontrada! Atualizando...');
+                      window.location.reload();
+                    }
+                  };
+                }
+              };
+            })
+            .catch(err => console.log('Erro ao registrar Service Worker:', err));
+        });
+      }
+    </script>
+  </body>
+</html>
+

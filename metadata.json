@@ -1,0 +1,8 @@
+{
+  "name": "Tempos e Movimentos PDI",
+  "description": "Aplicativo para cronometragem de tempos e movimentos para o processo de PDI Homo.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
